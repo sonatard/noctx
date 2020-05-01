@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+var newRequestPkg = http.NewRequest
+
 func main() {
 	const url = "http://example.com"
 	cli := &http.Client{}
@@ -55,6 +57,9 @@ func main() {
 	req51, _ := newRequest(http.MethodPost, url, nil) // OK
 	req51 = req51.WithContext(ctx)
 	cli.Do(req51)
+
+	req52, _ := newRequestPkg(http.MethodPost, url, nil) // want `should rewrite http.NewRequest to http.NewRequestWithContext or http.NewRequest and \(\*Request\).WithContext`
+	cli.Do(req52)
 
 	type MyRequest = http.Request
 	f3 := func(req *MyRequest, ctx context.Context) *MyRequest {
