@@ -3,6 +3,7 @@ package reqwithoutctx
 import (
 	"strings"
 
+	"github.com/gostaticanalysis/analysisutil"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 	"golang.org/x/tools/go/ssa"
@@ -11,16 +12,23 @@ import (
 func requestsByNewRequest(pass *analysis.Pass) map[*ssa.Call]*ssa.Extract {
 	reqs := make(map[*ssa.Call]*ssa.Extract)
 
+	newRequestType := analysisutil.TypeOf(pass, "net/http", "NewRequest")
+
 	srcFuncs := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
 	for _, f := range srcFuncs {
 		for _, b := range f.Blocks {
 			for _, instr := range b.Instrs {
-				if ext, ok := instr.(*ssa.Extract); ok && ext.Type().String() == "*net/http.Request" {
-					operands := instr.Operands([]*ssa.Value{})
-					operand := *operands[0]
-
-					if f, ok := operand.(*ssa.Call); ok && strings.Contains(f.String(), "net/http.NewRequest(") {
-						reqs[f] = ext
+				if ext, ok := instr.(*ssa.Extract); ok {
+					if ext.Type().String() == "*net/http.Request" {
+						operands := ext.Operands([]*ssa.Value{})
+						if len(operands) == 1 {
+							operand := *operands[0]
+							if f, ok := operand.(*ssa.Call); ok {
+								if f.Call.Value.Type().String() == newRequestType.String() {
+									reqs[f] = ext
+								}
+							}
+						}
 					}
 				}
 			}
