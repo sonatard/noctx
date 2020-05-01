@@ -9,4 +9,6 @@ linters:
   disable:
     - gochecknoglobals
     - gomnd
+    - gocognit
+    - nestif
 
