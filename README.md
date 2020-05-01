@@ -80,6 +80,12 @@ func main() {
 	req4, _ := http.NewRequest(http.MethodPost, url, nil) // want `Must not use http.NewRequest. Use http.NewRequestWithContext or http.NewRequest with \(\*Request\)\.WithContext`
 	req4 = f2(req4, ctx)
 	cli.Do(req4)
+
+	req5, _ := func() (*http.Request, error) {
+		return http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequest to http.NewRequestWithContext or http.NewRequest and \(\*Request\).WithContext`
+	}()
+	cli.Do(req5)
+
 }
 ```
 
