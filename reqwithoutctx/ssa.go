@@ -73,13 +73,6 @@ func (a *analyzer) usedReqs() map[string]*ssa.Extract {
 func (a *analyzer) usedReqByCall(call *ssa.Call) []*ssa.Extract {
 	var exts []*ssa.Extract
 
-	fType := call.String()
-
-	// skip net/http.Request method call
-	if strings.Contains(fType, "net/http.Request).") {
-		return exts
-	}
-
 	args := call.Common().Args
 	if len(args) == 0 {
 		return exts
@@ -87,6 +80,10 @@ func (a *analyzer) usedReqByCall(call *ssa.Call) []*ssa.Extract {
 
 	for _, arg := range args {
 		if ext, ok := arg.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
+			// skip net/http.Request method call
+			if strings.Contains(call.String(), "(*net/http.Request).") {
+				continue
+			}
 			exts = append(exts, ext)
 		}
 	}
