@@ -1,65 +1,63 @@
 package reqwithoutctx
 
 import (
+	"go/types"
 	"strings"
 
-	"github.com/gostaticanalysis/analysisutil"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 	"golang.org/x/tools/go/ssa"
 )
 
-func requestsByNewRequest(pass *analysis.Pass) map[*ssa.Call]*ssa.Extract {
-	reqs := make(map[*ssa.Call]*ssa.Extract)
+type analyzer struct {
+	pass           *analysis.Pass
+	newRequestType types.Type
+	requestType    types.Type
+}
 
-	newRequestType := analysisutil.TypeOf(pass, "net/http", "NewRequest")
+func (a *analyzer) Exec() []*Report {
+	usedReqs := a.usedReqs()
+	newReqs := a.requestsByNewRequest()
 
-	srcFuncs := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
-	for _, f := range srcFuncs {
-		for _, b := range f.Blocks {
-			for _, instr := range b.Instrs {
-				if ext, ok := instr.(*ssa.Extract); ok {
-					if ext.Type().String() == "*net/http.Request" {
-						operands := ext.Operands([]*ssa.Value{})
-						if len(operands) == 1 {
-							operand := *operands[0]
-							if f, ok := operand.(*ssa.Call); ok {
-								if f.Call.Value.Type().String() == newRequestType.String() {
-									reqs[f] = ext
-								}
-							}
-						}
-					}
-				}
+	return a.report(usedReqs, newReqs)
+}
+
+func (a *analyzer) report(usedReqs map[string]*ssa.Extract, newReqs map[*ssa.Call]*ssa.Extract) []*Report {
+	var reports []*Report
+
+	for _, fReq := range usedReqs {
+		for newRequest, req := range newReqs {
+			if fReq == req {
+				reports = append(reports, &Report{Instruction: newRequest})
 			}
 		}
 	}
 
-	return reqs
+	return reports
 }
 
-func usedReqs(pass *analysis.Pass) map[string]*ssa.Extract {
+func (a *analyzer) usedReqs() map[string]*ssa.Extract {
 	reqExts := make(map[string]*ssa.Extract)
 
-	srcFuncs := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
+	srcFuncs := a.pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
 	for _, sf := range srcFuncs {
 		for _, b := range sf.Blocks {
 			for _, instr := range b.Instrs {
 				switch i := instr.(type) {
 				case *ssa.Call:
-					exts := extractByCall(i)
+					exts := a.usedReqByCall(i)
 					for _, ext := range exts {
 						key := i.String() + ext.String()
 						reqExts[key] = ext
 					}
 				case *ssa.UnOp:
-					ext := extractByUnOp(i)
+					ext := a.usedReqByUnOp(i)
 					if ext != nil {
 						key := i.String() + ext.String()
 						reqExts[key] = ext
 					}
 				case *ssa.Return:
-					exts := extractByReturn(i)
+					exts := a.usedReqByReturn(i)
 					for _, ext := range exts {
 						key := i.String() + ext.String()
 						reqExts[key] = ext
@@ -72,7 +70,7 @@ func usedReqs(pass *analysis.Pass) map[string]*ssa.Extract {
 	return reqExts
 }
 
-func extractByCall(call *ssa.Call) []*ssa.Extract {
+func (a *analyzer) usedReqByCall(call *ssa.Call) []*ssa.Extract {
 	var exts []*ssa.Extract
 
 	fType := call.String()
@@ -88,7 +86,7 @@ func extractByCall(call *ssa.Call) []*ssa.Extract {
 	}
 
 	for _, arg := range args {
-		if ext, ok := arg.(*ssa.Extract); ok && strings.Contains(ext.Type().String(), "net/http.Request") {
+		if ext, ok := arg.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
 			exts = append(exts, ext)
 		}
 	}
@@ -96,23 +94,50 @@ func extractByCall(call *ssa.Call) []*ssa.Extract {
 	return exts
 }
 
-func extractByUnOp(op *ssa.UnOp) *ssa.Extract {
-	if ext, ok := op.X.(*ssa.Extract); ok && strings.Contains(ext.Type().String(), "net/http.Request") {
+func (a *analyzer) usedReqByUnOp(op *ssa.UnOp) *ssa.Extract {
+	if ext, ok := op.X.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
 		return ext
 	}
 
 	return nil
 }
 
-func extractByReturn(ret *ssa.Return) []*ssa.Extract {
+func (a *analyzer) usedReqByReturn(ret *ssa.Return) []*ssa.Extract {
 	rets := ret.Results
 	exts := make([]*ssa.Extract, 0, len(rets))
 
 	for _, ret := range rets {
-		if ext, ok := ret.(*ssa.Extract); ok && strings.Contains(ext.Type().String(), "net/http.Request") {
+		if ext, ok := ret.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
 			exts = append(exts, ext)
 		}
 	}
 
 	return exts
+}
+
+func (a *analyzer) requestsByNewRequest() map[*ssa.Call]*ssa.Extract {
+	reqs := make(map[*ssa.Call]*ssa.Extract)
+
+	srcFuncs := a.pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
+	for _, f := range srcFuncs {
+		for _, b := range f.Blocks {
+			for _, instr := range b.Instrs {
+				if ext, ok := instr.(*ssa.Extract); ok {
+					if types.Identical(ext.Type(), a.requestType) {
+						operands := ext.Operands([]*ssa.Value{})
+						if len(operands) == 1 {
+							operand := *operands[0]
+							if f, ok := operand.(*ssa.Call); ok {
+								if types.Identical(f.Call.Value.Type(), a.newRequestType) {
+									reqs[f] = ext
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return reqs
 }
