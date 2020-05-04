@@ -92,5 +92,5 @@ func main() {
 ## Reference
 - [net/http - NewRequest](https://golang.org/pkg/net/http/#NewRequest)
 - [net/http - NewRequestWithContext](https://golang.org/pkg/net/http/#NewRequestWithContext)
-- [net/http - Request.WithCOntext](https://golang.org/pkg/net/http/#Request.WithContext)
+- [net/http - Request.WithContext](https://golang.org/pkg/net/http/#Request.WithContext)
 
