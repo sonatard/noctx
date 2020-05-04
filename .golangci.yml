@@ -12,3 +12,9 @@ linters:
     - gocognit
     - nestif
 
+issues:
+  exclude-rules:
+    - path: reqwithoutctx/ssa.go
+      text: "Consider preallocating `exts`"
+      linters:
+        - prealloc

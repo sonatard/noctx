@@ -91,20 +91,27 @@ func (a *Analyzer) usedReqs() map[string]*ssa.Extract {
 func (a *Analyzer) usedReqByCall(call *ssa.Call) []*ssa.Extract {
 	var exts []*ssa.Extract
 
+	// skip net/http.Request method call
+	if strings.Contains(call.String(), "(*net/http.Request).") {
+		return exts
+	}
+
 	args := call.Common().Args
 	if len(args) == 0 {
 		return exts
 	}
 
 	for _, arg := range args {
-		if ext, ok := arg.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
-			// skip net/http.Request method call
-			if strings.Contains(call.String(), "(*net/http.Request).") {
-				continue
-			}
-
-			exts = append(exts, ext)
+		ext, ok := arg.(*ssa.Extract)
+		if !ok {
+			continue
 		}
+
+		if !types.Identical(ext.Type(), a.requestType) {
+			continue
+		}
+
+		exts = append(exts, ext)
 	}
 
 	return exts
@@ -123,7 +130,12 @@ func (a *Analyzer) usedReqByReturn(ret *ssa.Return) []*ssa.Extract {
 	exts := make([]*ssa.Extract, 0, len(rets))
 
 	for _, ret := range rets {
-		if ext, ok := ret.(*ssa.Extract); ok && types.Identical(ext.Type(), a.requestType) {
+		ext, ok := ret.(*ssa.Extract)
+		if !ok {
+			continue
+		}
+
+		if types.Identical(ext.Type(), a.requestType) {
 			exts = append(exts, ext)
 		}
 	}
@@ -147,13 +159,19 @@ func (a *Analyzer) requestsByNewRequest() map[*ssa.Call]*ssa.Extract {
 				}
 
 				operands := ext.Operands([]*ssa.Value{})
-				if len(operands) == 1 {
-					operand := *operands[0]
-					if f, ok := operand.(*ssa.Call); ok {
-						if types.Identical(f.Call.Value.Type(), a.newRequestType) {
-							reqs[f] = ext
-						}
-					}
+				if len(operands) != 1 {
+					continue
+				}
+
+				operand := *operands[0]
+
+				f, ok := operand.(*ssa.Call)
+				if !ok {
+					continue
+				}
+
+				if types.Identical(f.Call.Value.Type(), a.newRequestType) {
+					reqs[f] = ext
 				}
 			}
 		}

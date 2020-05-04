@@ -19,6 +19,7 @@ func Run(pass *analysis.Pass) (interface{}, error) {
 		"(*net/http.Client).Post",
 		"(*net/http.Client).PostForm",
 	}
+
 	ngFuncs := typeFuncs(pass, ngFuncNames)
 	if len(ngFuncs) == 0 {
 		return nil, nil
