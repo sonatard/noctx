@@ -6,7 +6,6 @@ import (
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
-
 	"golang.org/x/tools/go/ssa"
 )
 

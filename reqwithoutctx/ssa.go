@@ -145,16 +145,21 @@ func (a *Analyzer) requestsByNewRequest() map[*ssa.Call]*ssa.Extract {
 	for _, f := range a.netHTTPImportFuncs {
 		for _, b := range f.Blocks {
 			for _, instr := range b.Instrs {
-				if ext, ok := instr.(*ssa.Extract); ok {
-					if types.Identical(ext.Type(), a.requestType) {
-						operands := ext.Operands([]*ssa.Value{})
-						if len(operands) == 1 {
-							operand := *operands[0]
-							if f, ok := operand.(*ssa.Call); ok {
-								if types.Identical(f.Call.Value.Type(), a.newRequestType) {
-									reqs[f] = ext
-								}
-							}
+				ext, ok := instr.(*ssa.Extract)
+				if !ok {
+					continue
+				}
+
+				if !types.Identical(ext.Type(), a.requestType) {
+					continue
+				}
+
+				operands := ext.Operands([]*ssa.Value{})
+				if len(operands) == 1 {
+					operand := *operands[0]
+					if f, ok := operand.(*ssa.Call); ok {
+						if types.Identical(f.Call.Value.Type(), a.newRequestType) {
+							reqs[f] = ext
 						}
 					}
 				}
