@@ -1,9 +1,7 @@
 package reqwithoutctx
 
 import (
-	"go/ast"
 	"go/types"
-	"strconv"
 	"strings"
 
 	"github.com/gostaticanalysis/analysisutil"
@@ -14,9 +12,9 @@ import (
 )
 
 type Analyzer struct {
-	netHTTPImportFuncs []*ssa.Function
-	newRequestType     types.Type
-	requestType        types.Type
+	Funcs          []*ssa.Function
+	newRequestType types.Type
+	requestType    types.Type
 }
 
 func NewAnalyzer(pass *analysis.Pass) *Analyzer {
@@ -24,25 +22,19 @@ func NewAnalyzer(pass *analysis.Pass) *Analyzer {
 	requestType := analysisutil.TypeOf(pass, "net/http", "*Request")
 
 	srcFuncs := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA).SrcFuncs
-	skipFile := make(map[*ast.File]bool)
-	netHTTPImportFuncs := make([]*ssa.Function, 0, len(srcFuncs))
-
-	for _, f := range srcFuncs {
-		if UnImportedNetHTTP(pass, f, skipFile) {
-			continue
-		}
-
-		netHTTPImportFuncs = append(netHTTPImportFuncs, f)
-	}
 
 	return &Analyzer{
-		netHTTPImportFuncs: netHTTPImportFuncs,
-		newRequestType:     newRequestType,
-		requestType:        requestType,
+		Funcs:          srcFuncs,
+		newRequestType: newRequestType,
+		requestType:    requestType,
 	}
 }
 
 func (a *Analyzer) Exec() []*Report {
+	if a.newRequestType == nil || a.requestType == nil {
+		return []*Report{}
+	}
+
 	usedReqs := a.usedReqs()
 	newReqs := a.requestsByNewRequest()
 
@@ -66,7 +58,7 @@ func (a *Analyzer) report(usedReqs map[string]*ssa.Extract, newReqs map[*ssa.Cal
 func (a *Analyzer) usedReqs() map[string]*ssa.Extract {
 	reqExts := make(map[string]*ssa.Extract)
 
-	for _, f := range a.netHTTPImportFuncs {
+	for _, f := range a.Funcs {
 		for _, b := range f.Blocks {
 			for _, instr := range b.Instrs {
 				switch i := instr.(type) {
@@ -142,7 +134,7 @@ func (a *Analyzer) usedReqByReturn(ret *ssa.Return) []*ssa.Extract {
 func (a *Analyzer) requestsByNewRequest() map[*ssa.Call]*ssa.Extract {
 	reqs := make(map[*ssa.Call]*ssa.Extract)
 
-	for _, f := range a.netHTTPImportFuncs {
+	for _, f := range a.Funcs {
 		for _, b := range f.Blocks {
 			for _, instr := range b.Instrs {
 				ext, ok := instr.(*ssa.Extract)
@@ -168,38 +160,4 @@ func (a *Analyzer) requestsByNewRequest() map[*ssa.Call]*ssa.Extract {
 	}
 
 	return reqs
-}
-
-func UnImportedNetHTTP(pass *analysis.Pass, f *ssa.Function, skipFile map[*ast.File]bool) (ret bool) {
-	obj := f.Object()
-	if obj == nil {
-		return false
-	}
-
-	file := analysisutil.File(pass, obj.Pos())
-	if file == nil {
-		return false
-	}
-
-	if skip, has := skipFile[file]; has {
-		return skip
-	}
-
-	defer func() {
-		skipFile[file] = ret
-	}()
-
-	for _, impt := range file.Imports {
-		path, err := strconv.Unquote(impt.Path.Value)
-		if err != nil {
-			continue
-		}
-
-		path = analysisutil.RemoveVendor(path)
-		if path == "net/http" {
-			return false
-		}
-	}
-
-	return true
 }
