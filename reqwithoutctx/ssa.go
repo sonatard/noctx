@@ -2,7 +2,6 @@ package reqwithoutctx
 
 import (
 	"go/types"
-	"strings"
 
 	"github.com/gostaticanalysis/analysisutil"
 
@@ -92,7 +91,7 @@ func (a *Analyzer) usedReqByCall(call *ssa.Call) []*ssa.Extract {
 	var exts []*ssa.Extract
 
 	// skip net/http.Request method call
-	if strings.Contains(call.String(), "(*net/http.Request).") {
+	if call.Common().Signature().Recv() != nil && types.Identical(call.Value().Type(), a.requestType) {
 		return exts
 	}
 
