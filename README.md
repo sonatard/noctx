@@ -5,7 +5,7 @@
 `noctx` finds sending http request without context.Context.
 
 You should use `noctx` if sending http request in your library. 
-Passing context.Context enables library user to cancel http request, getting trace information and so on.
+Passing `context.Context` enables library user to cancel http request, getting trace information and so on.
 
 ## Install
 
@@ -22,22 +22,22 @@ $ go vet -vettool=`which noctx` main.go
 
 ## Detection rules
 - Executing following functions
-  - net/http.Get
-  - net/http.Head
-  - net/http.Post
-  - net/http.PostForm
-  - (*net/http.Client).Get
-  - (*net/http.Client).Head
-  - (*net/http.Client).Post
-  - (*net/http.Client).PostForm
-- http.Request returned by NewRequest function and passes it to other function.
+  - `net/http.Get`
+  - `net/http.Head`
+  - `net/http.Post`
+  - `net/http.PostForm`
+  - `(*net/http.Client).Get`
+  - `(*net/http.Client).Head`
+  - `(*net/http.Client).Post`
+  - `(*net/http.Client).PostForm`
+- `http.Request` returned by `http.NewRequest` function and passes it to other function.
 
 ## How to fix
-- Send http request using (*http.Client).Do(*http.Request) method.
-- In Go 1.13 and later, use http.NewRequestWithContext function instead of using http.NewRequest function.
-- In Go 1.12 and earlier, call (http.Request).WithContext(ctx) after calling http.NewRequest.
+- Send http request using `(*http.Client).Do(*http.Request)` method.
+- In Go 1.13 and later, use `http.NewRequestWithContext` function instead of using `http.NewRequest` function.
+- In Go 1.12 and earlier, call `(http.Request).WithContext(ctx)` after `http.NewRequest`.
 
-(http.Request).WithContext(ctx) has a disadvantage of performance because it returns a copy of http.Request. Use the http.NewRequestWithContext function if you only support Go1.13 or later.
+`(http.Request).WithContext(ctx)` has a disadvantage of performance because it returns a copy of http.Request. Use `http.NewRequestWithContext` function if you only support Go1.13 or later.
 
 ## Sample Code
 
