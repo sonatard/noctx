@@ -4,9 +4,8 @@
 
 `noctx` finds sending http request without context.Context.
 
-You have to pass a context.Context in order to cancel an http request or get trace information.
-If you are providing a library, you have to abide this rule or the users of the library will get in trouble.
-But many of the ways to send an HTTP request do not allow you to pass a context.Context.
+You should use `noctx` if sending http request in your library. 
+Passing context.Context enables library user to cancel http request, getting trace information and so on.
 
 ## Install
 
@@ -34,13 +33,13 @@ $ go vet -vettool=`which noctx` main.go
 - http.Request returned by NewRequest function and passes it to other function.
 
 ## How to fix
-- Send a request using the (*http.Client).Do(*http.Request) method.
-- In Go 1.13 and later, use the http.NewRequestWithContext function instead of using the http.NewRequest function.
-- In Go 1.12 and earlier, (http.Request).WithContext(ctx) is executed after the http.NewRequest function is executed.
+- Send http request using (*http.Client).Do(*http.Request) method.
+- In Go 1.13 and later, use http.NewRequestWithContext function instead of using http.NewRequest function.
+- In Go 1.12 and earlier, call (http.Request).WithContext(ctx) after calling http.NewRequest.
 
 (http.Request).WithContext(ctx) has a disadvantage of performance because it returns a copy of http.Request. Use the http.NewRequestWithContext function if you only support Go1.13 or later.
 
-## Smaple code
+## Sample Code
 
 ```go
 package main
@@ -63,7 +62,7 @@ func main() {
 	cli.Post(url, "", nil) // want `\(\*net/http\.Client\)\.Post must not be called`
 	cli.PostForm(url, nil) // want `\(\*net/http\.Client\)\.PostForm must not be called`
 
-	req, _ := http.NewRequest(http.MethodPost, url, nil) // want `Must not use http.NewRequest. Use http.NewRequestWithContext or http.NewRequest with \(\*Request\)\.WithContext`
+	req, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
 	cli.Do(req)
 
 	ctx := context.Background()
@@ -77,12 +76,12 @@ func main() {
 	f2 := func(req *http.Request, ctx context.Context) *http.Request {
 		return req
 	}
-	req4, _ := http.NewRequest(http.MethodPost, url, nil) // want `Must not use http.NewRequest. Use http.NewRequestWithContext or http.NewRequest with \(\*Request\)\.WithContext`
+	req4, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
 	req4 = f2(req4, ctx)
 	cli.Do(req4)
 
 	req5, _ := func() (*http.Request, error) {
-		return http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequest to http.NewRequestWithContext or http.NewRequest and \(\*Request\).WithContext`
+		return http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
 	}()
 	cli.Do(req5)
 
