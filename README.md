@@ -37,7 +37,7 @@ $ go vet -vettool=`which noctx` main.go
 - In Go 1.13 and later, use `http.NewRequestWithContext` function instead of using `http.NewRequest` function.
 - In Go 1.12 and earlier, call `(http.Request).WithContext(ctx)` after `http.NewRequest`.
 
-`(http.Request).WithContext(ctx)` has a disadvantage of performance because it returns a copy of http.Request. Use `http.NewRequestWithContext` function if you only support Go1.13 or later.
+`(http.Request).WithContext(ctx)` has a disadvantage of performance because it returns a copy of `http.Request`. Use `http.NewRequestWithContext` function if you only support Go1.13 or later.
 
 ## Sample Code
 
