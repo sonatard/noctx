@@ -16,7 +16,7 @@ func (n *Report) Pos() token.Pos {
 }
 
 func (n *Report) Message() string {
-	return "should rewrite http.NewRequest to http.NewRequestWithContext or http.NewRequest and (*Request).WithContext"
+	return "should rewrite http.NewRequestWithContext or add (*Request).WithContext"
 }
 
 func report(pass *analysis.Pass, reports []*Report) {
