@@ -1,10 +1,10 @@
 # noctx
 
-![](https://github.com/sonatard/noctx/workflows/.github/workflows/ci.yml/badge.svg)
+![](https://github.com/sonatard/noctx/workflows/CI/badge.svg)
 
 `noctx` finds sending http request without context.Context.
 
-You should use `noctx` if sending http request in your library. 
+You should use `noctx` if sending http request in your library.
 Passing `context.Context` enables library user to cancel http request, getting trace information and so on.
 
 ## Install
