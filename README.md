@@ -7,17 +7,52 @@
 You should use `noctx` if sending http request in your library.
 Passing `context.Context` enables library user to cancel http request, getting trace information and so on.
 
-## Install
+## Usage
 
+
+### noctx with go vet
+
+go vet is a Go standard tool for analyzing source code.
+
+1. Install noctx.
 ```sh
 $ go get -u github.com/sonatard/noctx/cmd/noctx
 ```
 
-## Usage
-
+2. noctx execute
 ```sh
 $ go vet -vettool=`which noctx` main.go
 ./main.go:6:11: net/http.Get must not be called
+```
+
+### noctx with golangci-lint
+
+golangci-lint is a fast Go linters runner.
+
+1. Install golangci-lint.  
+[golangci-lint - Install](https://golangci-lint.run/usage/install/)
+
+2. Setup .golangci.yml
+```yaml:
+# Add noctx to enable linters.
+linters:
+  enable:
+    - noctx
+
+# Or enable-all is true.
+linters:
+  enable-all: true
+  disable:
+   - xxx # Add unused linter to disable linters.
+```
+
+3. noctx execute
+```sh
+# Use .golangci.yml
+$ golangci-lint run
+
+# Only noctx execute
+golangci-lint run --disable-all -E noctx
 ```
 
 ## Detection rules
