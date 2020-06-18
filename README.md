@@ -74,7 +74,51 @@ golangci-lint run --disable-all -E noctx
 
 `(http.Request).WithContext(ctx)` has a disadvantage of performance because it returns a copy of `http.Request`. Use `http.NewRequestWithContext` function if you only support Go1.13 or later.
 
-## Sample Code
+
+If your library already provides functions that don't accept context, you define a new function that accepts context and make the existing function a wrapper for a new function.
+
+
+```go
+// Before fix code
+// Sending an HTTP request but not accepting context
+func Send(body io.Reader)  error {
+    req,err := http.NewRequest(http.MethodPost, "http://example.com", body)
+    if err != nil {
+        return nil
+    }
+    _, err = http.DefaultClient.Do(req)
+    if err !=nil{
+        return err
+    }
+
+    return nil
+}
+```
+
+```go
+// After fix code
+func Send(body io.Reader) error {
+    // Pass context.Background() to SendWithContext
+    return SendWithContext(context.Background(), body)
+}
+
+// Sending an HTTP request and accepting context
+func SendWithContext(ctx context.Context, body io.Reader) error {
+    // Change NewRequest to NewRequestWithContext and pass context it
+    req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://example.com", body)
+    if err != nil {
+        return nil
+    }
+    _, err = http.DefaultClient.Do(req)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+```
+
+## Detection sample
 
 ```go
 package main
