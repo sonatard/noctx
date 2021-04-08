@@ -16,7 +16,7 @@ go vet is a Go standard tool for analyzing source code.
 
 1. Install noctx.
 ```sh
-$ go get -u github.com/sonatard/noctx/cmd/noctx
+$ go install github.com/sonatard/noctx/cmd/noctx@latest
 ```
 
 2. noctx execute
@@ -29,7 +29,7 @@ $ go vet -vettool=`which noctx` main.go
 
 golangci-lint is a fast Go linters runner.
 
-1. Install golangci-lint.  
+1. Install golangci-lint.
 [golangci-lint - Install](https://golangci-lint.run/usage/install/)
 
 2. Setup .golangci.yml
