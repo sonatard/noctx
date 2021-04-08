@@ -1,6 +1,6 @@
 module github.com/sonatard/noctx
 
-go 1.13
+go 1.16
 
 require (
 	github.com/gostaticanalysis/analysisutil v0.0.3
