@@ -84,10 +84,10 @@ If your library already provides functions that don't accept context, you define
 func Send(body io.Reader)  error {
     req,err := http.NewRequest(http.MethodPost, "http://example.com", body)
     if err != nil {
-        return nil
+        return err
     }
     _, err = http.DefaultClient.Do(req)
-    if err !=nil{
+    if err != nil{
         return err
     }
 
