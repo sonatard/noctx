@@ -107,7 +107,7 @@ func SendWithContext(ctx context.Context, body io.Reader) error {
     // Change NewRequest to NewRequestWithContext and pass context it
     req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://example.com", body)
     if err != nil {
-        return nil
+        return err
     }
     _, err = http.DefaultClient.Do(req)
     if err != nil {
