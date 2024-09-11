@@ -129,4 +129,9 @@ func main() {
 
 		return req14, req15
 	}()
+
+	req121, _ := http.NewRequest(http.MethodPost, url, nil) // OK
+	req121.AddCookie(&http.Cookie{Name: "k", Value: "v"})
+	req121 = req121.WithContext(context.WithValue(req.Context(), struct{}{}, 0))
+	cli.Do(req121)
 }
