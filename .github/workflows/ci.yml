@@ -1,26 +1,25 @@
 name: CI
-on: [push]
+on:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.20', '1.19' ]
+        go: [ '1.23', '1.22' ]
     name: Go ${{ matrix.go }} test
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Go
-        uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
       - name: Install GolangCI-Lint
-        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.51.2
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+      - run: make lint
       - run: make test_coverage
       - name: Upload code coverage to codecov
-        if: matrix.go == '1.20'
+        if: matrix.go == '1.23'
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.out
-      - run: make lint
