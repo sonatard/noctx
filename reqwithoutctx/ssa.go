@@ -5,7 +5,6 @@ import (
 	"go/types"
 
 	"github.com/gostaticanalysis/analysisutil"
-
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 	"golang.org/x/tools/go/ssa"
