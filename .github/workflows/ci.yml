@@ -1,13 +1,17 @@
 name: CI
+
 on:
   push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.23', '1.22' ]
+        go: [ stable, oldstable ]
     name: Go ${{ matrix.go }} test
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +23,7 @@ jobs:
       - run: make lint
       - run: make test_coverage
       - name: Upload code coverage to codecov
-        if: matrix.go == '1.23'
+        if: matrix.go == 'stable'
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.out
