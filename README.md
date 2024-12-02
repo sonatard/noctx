@@ -171,7 +171,6 @@ func main() {
 
 ## Reference
 
-- [net/http - NewRequest](https://golang.org/pkg/net/http/#NewRequest)
-- [net/http - NewRequestWithContext](https://golang.org/pkg/net/http/#NewRequestWithContext)
-- [net/http - Request.WithContext](https://golang.org/pkg/net/http/#Request.WithContext)
-
+- [net/http - NewRequest](https://pkg.go.dev/net/http#NewRequest)
+- [net/http - NewRequestWithContext](https://pkg.go.dev/net/http#NewRequestWithContext)
+- [net/http - Request.WithContext](https://pkg.go.dev/net/http#Request.WithContext)
