@@ -55,10 +55,10 @@ golangci-lint run --enable-only noctx
 ```
 
 ## net/http package
-### Detection rules
+### Rules
 https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L17-L26
 
-### Detection sample
+### Sample
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_client/http_client.go#L11
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_request/http_request.go#L17
 
@@ -66,12 +66,12 @@ https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/
 - [net/http - NewRequest](https://pkg.go.dev/net/http#NewRequest)
 - [net/http - NewRequestWithContext](https://pkg.go.dev/net/http#NewRequestWithContext)
 - [net/http - Request.WithContext](https://pkg.go.dev/net/http#Request.WithContext)
-- 
+ 
 ## database/sql package
-### Detection rules
+### Rules
 https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L29-L37
 
-### Detection sample
+### Sample
 https://github.com/sonatard/noctx/blob/6e0f6bb8de1bd8a3c6e73439614927fd59aa0a8a/testdata/src/sql/sql.go#L13
 
 ### Reference
