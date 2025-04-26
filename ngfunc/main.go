@@ -32,7 +32,6 @@ func Run(pass *analysis.Pass) (interface{}, error) {
 		"(*database/sql.DB).Query":    "must not be called. use (*database/sql.DB).QueryContext",
 		"(*database/sql.DB).QueryRow": "must not be called. use (*database/sql.DB).QueryRowContext",
 		"(*database/sql.Tx).Exec":     "must not be called. use (*database/sql.Tx).ExecContext",
-		"(*database/sql.Tx).Ping":     "must not be called. use (*database/sql.Tx).PingContext",
 		"(*database/sql.Tx).Prepare":  "must not be called. use (*database/sql.Tx).PrepareContext",
 		"(*database/sql.Tx).Query":    "must not be called. use (*database/sql.Tx).QueryContext",
 		"(*database/sql.Tx).QueryRow": "must not be called. use (*database/sql.Tx).QueryRowContext",
