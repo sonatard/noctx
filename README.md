@@ -143,7 +143,7 @@ func main() {
 	cli.Post(url, "", nil) // want `\(\*net/http\.Client\)\.Post must not be called`
 	cli.PostForm(url, nil) // want `\(\*net/http\.Client\)\.PostForm must not be called`
 
-	req, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
+	req, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext`
 	cli.Do(req)
 
 	ctx := context.Background()
@@ -157,12 +157,12 @@ func main() {
 	f2 := func(req *http.Request, ctx context.Context) *http.Request {
 		return req
 	}
-	req4, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
+	req4, _ := http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext`
 	req4 = f2(req4, ctx)
 	cli.Do(req4)
 
 	req5, _ := func() (*http.Request, error) {
-		return http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext or add \(\*Request\).WithContext`
+		return http.NewRequest(http.MethodPost, url, nil) // want `should rewrite http.NewRequestWithContext`
 	}()
 	cli.Do(req5)
 
