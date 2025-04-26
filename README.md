@@ -4,7 +4,7 @@
 
 `noctx` finds function calls without context.Context.
 
-If you are using net/http package, you should use noctx.
+If you are using net/http package and sql/database package, you should use noctx.
 Passing `context.Context` enables library user to cancel request, getting trace information and so on.
 
 ## Usage
@@ -117,3 +117,14 @@ https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/
 - [net/http - NewRequest](https://pkg.go.dev/net/http#NewRequest)
 - [net/http - NewRequestWithContext](https://pkg.go.dev/net/http#NewRequestWithContext)
 - [net/http - Request.WithContext](https://pkg.go.dev/net/http#Request.WithContext)
+- 
+## database/sqlpackage
+### Detection rules
+
+- Executing the following functions
+
+### Detection sample
+
+
+### Reference
+- [database/sql](https://pkg.go.dev/database/sql)
