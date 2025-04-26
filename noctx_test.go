@@ -7,7 +7,17 @@ import (
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
-func Test(t *testing.T) {
-	testdata := analysistest.TestData()
-	analysistest.Run(t, testdata, noctx.Analyzer, "a")
+func TestAnalyzer(t *testing.T) {
+	testCases := []struct {
+		desc string
+	}{
+		{desc: "http_client"},
+		{desc: "http_request"},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.desc, func(t *testing.T) {
+			analysistest.Run(t, analysistest.TestData(), noctx.Analyzer, test.desc)
+		})
+	}
 }
