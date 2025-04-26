@@ -56,75 +56,23 @@ golangci-lint run --enable-only noctx
 
 ## net/http package
 ### Detection rules
-
-- Executing the following functions
-https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/ngfunc/main.go#L15-L26
-
-### How to fix
-
-- use `http.NewRequestWithContext` function instead of using `http.NewRequest` function.
-- Send http request using `(*http.Client).Do(*http.Request)` method.
-
-If your library already provides functions that don't accept context, you define a new function that accepts context and make the existing function a wrapper for a new function.
-
-```go
-// Before fix code
-// Sending an HTTP request but not accepting context
-func Send(body io.Reader)  error {
-    req,err := http.NewRequest(http.MethodPost, "http://example.com", body)
-    if err != nil {
-        return err
-    }
-    _, err = http.DefaultClient.Do(req)
-    if err != nil{
-        return err
-    }
-
-    return nil
-}
-```
-
-```go
-// After fix code
-func Send(body io.Reader) error {
-    // Pass context.Background() to SendWithContext
-    return SendWithContext(context.Background(), body)
-}
-
-// Sending an HTTP request and accepting context
-func SendWithContext(ctx context.Context, body io.Reader) error {
-    // Change NewRequest to NewRequestWithContext and pass context to it
-    req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://example.com", body)
-    if err != nil {
-        return err
-    }
-    _, err = http.DefaultClient.Do(req)
-    if err != nil {
-        return err
-    }
-
-    return nil
-}
-```
+https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L17-L26
 
 ### Detection sample
-
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_client/http_client.go#L11
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_request/http_request.go#L17
 
 ### Reference
-
 - [net/http - NewRequest](https://pkg.go.dev/net/http#NewRequest)
 - [net/http - NewRequestWithContext](https://pkg.go.dev/net/http#NewRequestWithContext)
 - [net/http - Request.WithContext](https://pkg.go.dev/net/http#Request.WithContext)
 - 
-## database/sqlpackage
+## database/sql package
 ### Detection rules
-
-- Executing the following functions
+https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L29-L37
 
 ### Detection sample
-
+https://github.com/sonatard/noctx/blob/6e0f6bb8de1bd8a3c6e73439614927fd59aa0a8a/testdata/src/sql/sql.go#L13
 
 ### Reference
 - [database/sql](https://pkg.go.dev/database/sql)
