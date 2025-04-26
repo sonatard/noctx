@@ -12,6 +12,7 @@ linters:
     - exhaustruct
     - gochecknoglobals
     - gocognit
+    - lll
     - mnd
     - nestif
     - nilnil
