@@ -56,7 +56,7 @@ golangci-lint run --enable-only noctx
 
 ## net/http package
 ### Rules
-https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L17-L26
+https://github.com/sonatard/noctx/blob/a00128b6a4087639ed0d13a123d0f9960309824f/noctx.go#L28-L37
 
 ### Sample
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_client/http_client.go#L11
@@ -69,7 +69,7 @@ https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/
  
 ## database/sql package
 ### Rules
-https://github.com/sonatard/noctx/blob/127ded2eb4422a885f6e9c97e95cc9b89b7f1163/ngfunc/main.go#L29-L37
+https://github.com/sonatard/noctx/blob/a00128b6a4087639ed0d13a123d0f9960309824f/noctx.go#L40-L48
 
 ### Sample
 https://github.com/sonatard/noctx/blob/6e0f6bb8de1bd8a3c6e73439614927fd59aa0a8a/testdata/src/sql/sql.go#L13
