@@ -56,7 +56,7 @@ golangci-lint run --enable-only noctx
 
 ## net/http package
 ### Rules
-https://github.com/sonatard/noctx/blob/a00128b6a4087639ed0d13a123d0f9960309824f/noctx.go#L28-L37
+https://github.com/sonatard/noctx/blob/e9e23da29379b87a39ce50fd1ef7b273fee2461a/noctx.go#L28-L36
 
 ### Sample
 https://github.com/sonatard/noctx/blob/9a514098df3f8a88e0fd6949320c4e0aa51b520c/testdata/src/http_client/http_client.go#L11
