@@ -36,15 +36,20 @@ func Run(pass *analysis.Pass) (interface{}, error) {
 		"net/http.NewRequest":         "must not be called. use net/http.NewRequestWithContext",
 
 		// database/sql
-		"(*database/sql.DB).Exec":     "must not be called. use (*database/sql.DB).ExecContext",
-		"(*database/sql.DB).Ping":     "must not be called. use (*database/sql.DB).PingContext",
-		"(*database/sql.DB).Prepare":  "must not be called. use (*database/sql.DB).PrepareContext",
-		"(*database/sql.DB).Query":    "must not be called. use (*database/sql.DB).QueryContext",
-		"(*database/sql.DB).QueryRow": "must not be called. use (*database/sql.DB).QueryRowContext",
-		"(*database/sql.Tx).Exec":     "must not be called. use (*database/sql.Tx).ExecContext",
-		"(*database/sql.Tx).Prepare":  "must not be called. use (*database/sql.Tx).PrepareContext",
-		"(*database/sql.Tx).Query":    "must not be called. use (*database/sql.Tx).QueryContext",
-		"(*database/sql.Tx).QueryRow": "must not be called. use (*database/sql.Tx).QueryRowContext",
+		"(*database/sql.DB).Begin":      "must not be called. use (*database/sql.DB).BeginTx",
+		"(*database/sql.DB).Exec":       "must not be called. use (*database/sql.DB).ExecContext",
+		"(*database/sql.DB).Ping":       "must not be called. use (*database/sql.DB).PingContext",
+		"(*database/sql.DB).Prepare":    "must not be called. use (*database/sql.DB).PrepareContext",
+		"(*database/sql.DB).Query":      "must not be called. use (*database/sql.DB).QueryContext",
+		"(*database/sql.DB).QueryRow":   "must not be called. use (*database/sql.DB).QueryRowContext",
+		"(*database/sql.Tx).Exec":       "must not be called. use (*database/sql.Tx).ExecContext",
+		"(*database/sql.Tx).Prepare":    "must not be called. use (*database/sql.Tx).PrepareContext",
+		"(*database/sql.Tx).Query":      "must not be called. use (*database/sql.Tx).QueryContext",
+		"(*database/sql.Tx).QueryRow":   "must not be called. use (*database/sql.Tx).QueryRowContext",
+		"(*database/sql.Tx).Stmt":       "must not be called. use (*database/sql.Tx).StmtContext",
+		"(*database/sql.Stmt).Exec":     "must not be called. use (*database/sql.Conn).ExecContext",
+		"(*database/sql.Stmt).Query":    "must not be called. use (*database/sql.Conn).QueryContext",
+		"(*database/sql.Stmt).QueryRow": "must not be called. use (*database/sql.Conn).QueryRowContext",
 	}
 
 	ngFuncs := typeFuncs(pass, slices.Collect(maps.Keys(ngFuncMessages)))
