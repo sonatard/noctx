@@ -40,7 +40,7 @@ linters:
 
 # Or enable-all is true.
 linters:
-  enable-all: true
+  default: all
   disable:
    - xxx # Add unused linter to disable linters.
 ```
