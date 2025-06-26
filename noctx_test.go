@@ -11,6 +11,7 @@ func TestAnalyzer(t *testing.T) {
 	testCases := []struct {
 		desc string
 	}{
+		{desc: "crypto_tls"},
 		{desc: "http_client"},
 		{desc: "http_request"},
 		{desc: "network"},
