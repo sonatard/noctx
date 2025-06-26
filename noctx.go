@@ -64,6 +64,11 @@ var ngFuncMessages = map[string]string{
 	"(*database/sql.Stmt).Exec":     "must not be called. use (*database/sql.Conn).ExecContext",
 	"(*database/sql.Stmt).Query":    "must not be called. use (*database/sql.Conn).QueryContext",
 	"(*database/sql.Stmt).QueryRow": "must not be called. use (*database/sql.Conn).QueryRowContext",
+
+	// crypto/tls dialer
+	"crypto/tls.Dial":              "must not be called. use (*crypto/tls.Dialer).DialContext",
+	"crypto/tls.DialWithDialer":    "must not be called. use (*crypto/tls.Dialer).DialContext with NetDialer",
+	"(*crypto/tls.Conn).Handshake": "must not be called. use (*crypto/tls.Conn).HandshakeContext",
 }
 
 func Run(pass *analysis.Pass) (interface{}, error) {
