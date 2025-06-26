@@ -13,6 +13,7 @@ func TestAnalyzer(t *testing.T) {
 	}{
 		{desc: "http_client"},
 		{desc: "http_request"},
+		{desc: "network"},
 		{desc: "sql"},
 	}
 
