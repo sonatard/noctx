@@ -12,6 +12,7 @@ func TestAnalyzer(t *testing.T) {
 		desc string
 	}{
 		{desc: "crypto_tls"},
+		{desc: "exec_cmd"},
 		{desc: "http_client"},
 		{desc: "http_request"},
 		{desc: "network"},
