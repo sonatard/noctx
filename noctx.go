@@ -69,6 +69,16 @@ var ngFuncMessages = map[string]string{
 	"crypto/tls.Dial":              "must not be called. use (*crypto/tls.Dialer).DialContext",
 	"crypto/tls.DialWithDialer":    "must not be called. use (*crypto/tls.Dialer).DialContext with NetDialer",
 	"(*crypto/tls.Conn).Handshake": "must not be called. use (*crypto/tls.Conn).HandshakeContext",
+
+	// slog
+	"log/slog.Debug":           "must not be called. use log/slog.DebugContext",
+	"log/slog.Warn":            "must not be called. use log/slog.WarnContext",
+	"log/slog.Error":           "must not be called. use log/slog.ErrorContext",
+	"log/slog.Info":            "must not be called. use log/slog.InfoContext",
+	"(*log/slog.Logger).Debug": "must not be called. use (*log/slog.Logger).DebugContext",
+	"(*log/slog.Logger).Warn":  "must not be called. use (*log/slog.Logger).WarnContext",
+	"(*log/slog.Logger).Error": "must not be called. use (*log/slog.Logger).ErrorContext",
+	"(*log/slog.Logger).Info":  "must not be called. use (*log/slog.Logger).InfoContext",
 }
 
 func Run(pass *analysis.Pass) (interface{}, error) {
