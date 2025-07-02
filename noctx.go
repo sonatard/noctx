@@ -12,7 +12,7 @@ import (
 
 var Analyzer = &analysis.Analyzer{
 	Name:             "noctx",
-	Doc:              "noctx finds sending http request without context.Context",
+	Doc:              "noctx finds function calls without context.Context",
 	Run:              Run,
 	RunDespiteErrors: false,
 	Requires: []*analysis.Analyzer{
