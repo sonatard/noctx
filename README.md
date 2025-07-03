@@ -4,8 +4,9 @@
 
 `noctx` finds function calls without context.Context.
 
-If you are using net/http package and sql/database package, you should use noctx.
 Passing `context.Context` enables library user to cancel request, getting trace information and so on.
+
+`noctx` helps you to identify code that could be rewritten to use the context.Context.
 
 ## Usage
 
