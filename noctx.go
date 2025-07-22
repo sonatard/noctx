@@ -2,13 +2,23 @@ package noctx
 
 import (
 	"fmt"
+	"go/types"
 	"maps"
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/gostaticanalysis/analysisutil"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
+	"golang.org/x/tools/go/ssa"
 )
+
+var exclude string
+
+func init() {
+	Analyzer.Flags.StringVar(&exclude, "exclude", "", "comma-separated list of function patterns to exclude from checks (supports * wildcards)")
+}
 
 var Analyzer = &analysis.Analyzer{
 	Name:             "noctx",
@@ -85,7 +95,9 @@ var ngFuncMessages = map[string]string{
 }
 
 func Run(pass *analysis.Pass) (interface{}, error) {
-	ngFuncs := typeFuncs(pass, slices.Collect(maps.Keys(ngFuncMessages)))
+	// Get functions to check (considering exclusions)
+	funcNames := getFunctionsToCheck()
+	ngFuncs := typeFuncs(pass, funcNames)
 	if len(ngFuncs) == 0 {
 		return nil, nil
 	}
@@ -95,19 +107,81 @@ func Run(pass *analysis.Pass) (interface{}, error) {
 		panic(fmt.Sprintf("%T is not *buildssa.SSA", pass.ResultOf[buildssa.Analyzer]))
 	}
 
+	// Check all functions
+	checkFunctions(pass, ssa, ngFuncs)
+
+	return nil, nil
+}
+
+// getFunctionsToCheck returns the list of functions to check after applying exclusions.
+func getFunctionsToCheck() []string {
+	funcNames := slices.Collect(maps.Keys(ngFuncMessages))
+
+	if exclude == "" {
+		return funcNames
+	}
+
+	// Parse and apply exclusion patterns
+	excludePatterns := parseExcludePatterns(exclude)
+	if len(excludePatterns) > 0 {
+		funcNames = filterExcluded(funcNames, excludePatterns)
+	}
+
+	return funcNames
+}
+
+// parseExcludePatterns parses a comma-separated list of exclusion patterns.
+func parseExcludePatterns(patterns string) []string {
+	parts := strings.Split(patterns, ",")
+	result := make([]string, len(parts))
+	for i, p := range parts {
+		result[i] = strings.TrimSpace(p)
+	}
+
+	return result
+}
+
+// checkFunctions checks all functions in the SSA for disallowed calls.
+func checkFunctions(pass *analysis.Pass, ssa *buildssa.SSA, ngFuncs []*types.Func) {
 	for _, sf := range ssa.SrcFuncs {
 		for _, b := range sf.Blocks {
 			for _, instr := range b.Instrs {
-				for _, ngFunc := range ngFuncs {
-					if analysisutil.Called(instr, nil, ngFunc) {
-						pass.Reportf(instr.Pos(), "%s %s", ngFunc.FullName(), ngFuncMessages[ngFunc.FullName()])
-
-						break
-					}
-				}
+				checkInstruction(pass, instr, ngFuncs)
 			}
 		}
 	}
+}
 
-	return nil, nil
+// checkInstruction checks a single instruction for disallowed function calls.
+func checkInstruction(pass *analysis.Pass, instr ssa.Instruction, ngFuncs []*types.Func) {
+	for _, ngFunc := range ngFuncs {
+		if analysisutil.Called(instr, nil, ngFunc) {
+			pass.Reportf(instr.Pos(), "%s %s", ngFunc.FullName(), ngFuncMessages[ngFunc.FullName()])
+
+			break
+		}
+	}
+}
+
+// filterExcluded removes function names that match any of the exclusion patterns.
+func filterExcluded(funcNames []string, excludePatterns []string) []string {
+	var filtered []string
+
+	for _, name := range funcNames {
+		excluded := false
+
+		for _, pattern := range excludePatterns {
+			if matched, _ := filepath.Match(pattern, name); matched {
+				excluded = true
+
+				break
+			}
+		}
+
+		if !excluded {
+			filtered = append(filtered, name)
+		}
+	}
+
+	return filtered
 }
