@@ -113,14 +113,3 @@ https://github.com/sonatard/noctx/blob/b768dab1764733f7f69c5075b7497eff4c58f260/
 ### Reference
 - [exec - exec.CommandContext](https://pkg.go.dev/exec#CommandContext)
 
-## log/slog package
-
-### Rules
-https://github.com/sonatard/noctx/blob/b768dab1764733f7f69c5075b7497eff4c58f260/noctx.go#L76-L84
-
-### Sample
-https://github.com/sonatard/noctx/blob/b768dab1764733f7f69c5075b7497eff4c58f260/testdata/src/slog/slog.go#L12-L15
-
-### Reference
-- [slog - Using contexts](https://pkg.go.dev/log/slog#hdr-Contexts)
-
