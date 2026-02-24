@@ -15,6 +15,7 @@ func TestAnalyzer(t *testing.T) {
 		{desc: "exec_cmd"},
 		{desc: "http_client"},
 		{desc: "http_request"},
+		{desc: "httptest_request"},
 		{desc: "network"},
 		{desc: "sql"},
 	}
